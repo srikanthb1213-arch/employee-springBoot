@@ -1,5 +1,6 @@
 package org.example.employeeapp.Service;
 
+import org.example.employeeapp.ExceptionHandler.EmployeeNotFoundException;
 import org.example.employeeapp.Model.Employee;
 import org.example.employeeapp.Repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class EmployeeService {
     }
 
     public Employee findEmployeeById(Long id) {
-        return employeeRepository.findById(id).orElse(null);
+        return employeeRepository.findById(id).orElseThrow(()-> new RuntimeException("Employee with id finding: " + id + " not found"));
     }
 
     public List<Employee> findAllEmployees() {
@@ -35,10 +36,13 @@ public class EmployeeService {
             emp.setEmail(employee.getEmail());
             emp.setlastName(employee.getLastName());
             return employeeRepository.save(emp);
-        }).orElseThrow(()-> new RuntimeException("Employee Not Found"));
+        }).orElseThrow(()-> new RuntimeException("Employee Not Found: " +id));
     }
 
    public void deleteEmployeeById(Long id) {
+        if(!employeeRepository.existsById(id)){
+            throw new RuntimeException("Employee ID Not Found to delete: "+ id);
+        }
             employeeRepository.deleteById(id);
    }
 }
